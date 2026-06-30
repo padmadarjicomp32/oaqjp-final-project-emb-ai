@@ -1,0 +1,34 @@
+''' Executing this function initiates the application of emotion
+    detection to be executed over the Flask channel and deployed on
+    localhost:5000.
+'''
+from flask import Flask,render_template, request
+from EmotionDetection.emotion_detection import emotion_detector
+
+app = Flask("EmotionDetector")
+
+@app.route("/emotionDetector")
+def emotion_Detector():
+    text_to_analyze = request.args.get('textToAnalyze') 
+    response = emotion_detector(text_to_analyze)
+
+    emotions_label = list(response.keys())
+  
+    emotions_score = list(response.values())
+  
+    resultstr = f"""For the given statement, the system response is 
+    '{emotions_label[0]}':{emotions_score[0]},
+    '{emotions_label[1]}':{emotions_score[1]},
+    '{emotions_label[2]}':{emotions_score[2]},
+    '{emotions_label[3]}':{emotions_score[3]},
+    '{emotions_label[4]}':{emotions_score[4]}. The dominant emotion is <b>{emotions_score[5]}</b>.
+    """
+    
+    return resultstr
+
+@app.route('/')
+def render_index_page():
+    return render_template('index.html')
+
+if (__name__ == '__main__'):
+    app.run(host="0.0.0.0",port=5000,debug=True)
